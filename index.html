@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Bu Men haqimda gi websayti bolib uni huquqlari himoyalangan">
+    <meta http-equiv="author" content="Asadullo">
+    <title>Asadullo — Men Haqimda</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0a0a0f;
+            --surface: #12121a;
+            --card: #1a1a26;
+            --border: #2a2a40;
+            --accent: #c8a96e;
+            --accent2: #6e8fc8;
+            --text: #e8e4d8;
+            --muted: #7a7a9a;
+            --glow: rgba(200, 169, 110, 0.15);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'DM Sans', sans-serif;
+            font-weight: 300;
+            overflow-x: hidden;
+            cursor: none;
+        }
+
+        /* Custom cursor */
+        .cursor {
+            width: 10px; height: 10px;
+            background: var(--accent);
+            border-radius: 50%;
+            position: fixed;
+            pointer-events: none;
+            z-index: 9999;
+            transition: transform 0.15s ease;
+            mix-blend-mode: difference;
+        }
+        .cursor-ring {
+            width: 36px; height: 36px;
+            border: 1px solid var(--accent);
+            border-radius: 50%;
+            position: fixed;
+            pointer-events: none;
+            z-index: 9998;
+            transition: all 0.12s ease;
+            opacity: 0.6;
+        }
+        body:hover .cursor { transform: scale(1); }
+        a:hover ~ .cursor, button:hover ~ .cursor { transform: scale(2.5); }
+
+        /* Grain overlay */
+        body::before {
+            content: '';
+            position: fixed; inset: 0;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+            pointer-events: none;
+            z-index: 1000;
+            opacity: 0.4;
+        }
+
+        /* Hero */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 4rem 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::after {
+            content: '';
+            position: absolute;
+            width: 600px; height: 600px;
+            background: radial-gradient(circle, rgba(200,169,110,0.08) 0%, transparent 70%);
+            border-radius: 50%;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            animation: pulse 4s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+            50% { transform: translate(-50%, -50%) scale(1.1); opacity: 0.6; }
+        }
+
+        .hero-label {
+            font-size: 0.7rem;
+            letter-spacing: 0.3em;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: 1.5rem;
+            opacity: 0;
+            animation: fadeUp 0.8s ease forwards 0.2s;
+        }
+
+        .hero-name {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(3.5rem, 10vw, 8rem);
+            font-weight: 900;
+            line-height: 0.9;
+            color: var(--text);
+            opacity: 0;
+            animation: fadeUp 0.8s ease forwards 0.4s;
+            position: relative;
+            z-index: 2;
+        }
+
+        .hero-name span {
+            display: block;
+            color: var(--accent);
+            font-style: italic;
+        }
+
+        .hero-sub {
+            margin-top: 2rem;
+            font-size: 0.9rem;
+            color: var(--muted);
+            letter-spacing: 0.1em;
+            opacity: 0;
+            animation: fadeUp 0.8s ease forwards 0.6s;
+        }
+
+        .scroll-hint {
+            position: absolute;
+            bottom: 2.5rem;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+            opacity: 0;
+            animation: fadeUp 0.8s ease forwards 1s;
+            color: var(--muted);
+            font-size: 0.7rem;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+        }
+
+        .scroll-line {
+            width: 1px;
+            height: 50px;
+            background: linear-gradient(to bottom, var(--accent), transparent);
+            animation: scrollLine 2s ease-in-out infinite;
+        }
+
+        @keyframes scrollLine {
+            0%, 100% { transform: scaleY(1); transform-origin: top; }
+            50% { transform: scaleY(0.3); transform-origin: top; }
+        }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Sections */
+        .section {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 5rem 2rem;
+            opacity: 0;
+            transform: translateY(40px);
+            transition: opacity 0.7s ease, transform 0.7s ease;
+        }
+
+        .section.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .section-tag {
+            font-size: 0.65rem;
+            letter-spacing: 0.35em;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: 1rem;
+        }
+
+        .section-title {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(1.8rem, 4vw, 3rem);
+            font-weight: 700;
+            margin-bottom: 2.5rem;
+            color: var(--text);
+        }
+
+        /* Cards grid */
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 2rem 1.5rem;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--accent), var(--accent2));
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+            transform-origin: left;
+        }
+
+        .card:hover {
+            border-color: var(--accent);
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4), 0 0 30px var(--glow);
+        }
+
+        .card:hover::before { transform: scaleX(1); }
+
+        .card-icon {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .card-label {
+            font-size: 0.65rem;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--muted);
+            margin-bottom: 0.4rem;
+        }
+
+        .card-value {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.3rem;
+            color: var(--text);
+            font-weight: 700;
+        }
+
+        /* Divider */
+        .divider {
+            width: 100%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--border), transparent);
+            margin: 0 auto;
+        }
+
+        /* Education section */
+        .edu-block {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 2.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .edu-block::after {
+            content: '';
+            position: absolute;
+            bottom: -40px; right: -40px;
+            width: 120px; height: 120px;
+            border: 20px solid var(--border);
+            border-radius: 50%;
+            opacity: 0.4;
+        }
+
+        .price-row {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-top: 1.2rem;
+            flex-wrap: wrap;
+        }
+
+        .price-old {
+            font-size: 1rem;
+            color: var(--muted);
+            text-decoration: line-through;
+            text-decoration-color: rgba(200,100,100,0.7);
+        }
+
+        .price-new {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.8rem;
+            color: var(--accent);
+            font-weight: 700;
+        }
+
+        .badge {
+            background: rgba(110, 143, 200, 0.15);
+            color: var(--accent2);
+            border: 1px solid rgba(110,143,200,0.3);
+            border-radius: 20px;
+            padding: 0.3rem 0.8rem;
+            font-size: 0.7rem;
+            letter-spacing: 0.1em;
+        }
+
+        /* Links */
+        .links-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.8rem 1.8rem;
+            border-radius: 50px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 500;
+            letter-spacing: 0.05em;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            cursor: none;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .btn span { position: relative; z-index: 1; }
+
+        .btn-primary {
+            background: var(--accent);
+            color: var(--bg);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(200,169,110,0.4);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--text);
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(200,169,110,0.15);
+        }
+
+        /* Highlight box */
+        .highlight {
+            background: linear-gradient(135deg, rgba(200,169,110,0.08), rgba(110,143,200,0.05));
+            border: 1px solid rgba(200,169,110,0.2);
+            border-radius: 12px;
+            padding: 1.5rem 2rem;
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(1rem, 2.5vw, 1.4rem);
+            font-style: italic;
+            color: var(--accent);
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 3rem 2rem;
+            border-top: 1px solid var(--border);
+            color: var(--muted);
+            font-size: 0.75rem;
+            letter-spacing: 0.1em;
+        }
+
+        /* Stars background */
+        .stars {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .star {
+            position: absolute;
+            width: 1px; height: 1px;
+            background: white;
+            border-radius: 50%;
+            animation: twinkle var(--d, 3s) ease-in-out infinite var(--delay, 0s);
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: var(--min-op, 0.1); }
+            50% { opacity: var(--max-op, 0.8); }
+        }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            .cards { grid-template-columns: 1fr 1fr; }
+            .links-row { flex-direction: column; }
+            .btn { justify-content: center; }
+        }
+
+        /* Progress bar */
+        .progress-bar {
+            position: fixed;
+            top: 0; left: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--accent), var(--accent2));
+            z-index: 999;
+            transition: width 0.1s ease;
+        }
+
+        /* Nav dots */
+        .nav-dots {
+            position: fixed;
+            right: 2rem;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+            z-index: 100;
+        }
+
+        .nav-dot {
+            width: 6px; height: 6px;
+            border-radius: 50%;
+            background: var(--border);
+            transition: all 0.3s ease;
+            cursor: none;
+        }
+
+        .nav-dot.active {
+            background: var(--accent);
+            transform: scale(1.5);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Custom Cursor -->
+    <div class="cursor" id="cursor"></div>
+    <div class="cursor-ring" id="cursorRing"></div>
+
+    <!-- Progress Bar -->
+    <div class="progress-bar" id="progressBar"></div>
+
+    <!-- Stars -->
+    <div class="stars" id="stars"></div>
+
+    <!-- Nav Dots -->
+    <div class="nav-dots" id="navDots">
+        <div class="nav-dot active" data-section="0"></div>
+        <div class="nav-dot" data-section="1"></div>
+        <div class="nav-dot" data-section="2"></div>
+        <div class="nav-dot" data-section="3"></div>
+    </div>
+
+    <!-- Hero -->
+    <section class="hero" id="sec0">
+        <div class="hero-label">Portfolio · Shaxsiy Sahifa</div>
+        <h1 class="hero-name">
+            Asadullo
+            <span>Mirhamidullayev</span>
+        </h1>
+        <p class="hero-sub">Algoritm IT Academy · Namanganlik · O'zbekiston 🇺🇿</p>
+        <div class="scroll-hint">
+            <div class="scroll-line"></div>
+            Pastga aylantiring
+        </div>
+    </section>
+
+    <!-- Location -->
+    <div class="divider"></div>
+    <section class="section" id="sec1">
+        <div class="section-tag">📍 Joylashuv</div>
+        <h2 class="section-title">Qayerlikman</h2>
+        <div class="cards">
+            <div class="card">
+                <div class="card-icon">🌍</div>
+                <div class="card-label">Davlat</div>
+                <div class="card-value">O'zbekiston</div>
+            </div>
+            <div class="card">
+                <div class="card-icon">🏙️</div>
+                <div class="card-label">Viloyat</div>
+                <div class="card-value">Namangan</div>
+            </div>
+            <div class="card">
+                <div class="card-icon">🏡</div>
+                <div class="card-label">Tuman</div>
+                <div class="card-value">Uychi</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Education -->
+    <div class="divider"></div>
+    <section class="section" id="sec2">
+        <div class="section-tag">🎓 Ta'lim</div>
+        <h2 class="section-title">Qayerda O'qiyman</h2>
+        <div class="highlight">
+            Men Shahardagi Algoritm IT Academy'da o'qiyman
+        </div>
+        <div class="edu-block">
+            <div class="card-label">Joriy Narx</div>
+            <div class="price-row">
+                <span class="price-old">490,000 so'm</span>
+                <span class="price-new">790,000 so'm</span>
+                <span class="badge">✨ Yangi narx</span>
+            </div>
+            <p style="margin-top:1.5rem; color: var(--muted); font-size:0.9rem; line-height:1.7;">
+                Ilgari <strong style="color:var(--text)">IT Kids</strong> da o'qigan bo'lsam, hozir Algoritm IT Academy'da yangi bosqichda davom etmoqdaman.
+            </p>
+        </div>
+    </section>
+
+    <!-- Links -->
+    <div class="divider"></div>
+    <section class="section" id="sec3">
+        <div class="section-tag">🔗 Havolalar</div>
+        <h2 class="section-title">Loyihalar & Algoritm</h2>
+        <div class="links-row">
+            <a href="https://algoritmedu.uz/" target="_blank" class="btn btn-primary">
+                <span>🚀 Algoritm bilan Bo'laning</span>
+            </a>
+            <a href="https://tunafo-test.vercel.app/" target="_blank" class="btn btn-secondary">
+                <span>💼 Mening Loyihalarim</span>
+            </a>
+            <a href="1.html" class="btn btn-secondary">
+                <span>🖼️ Mening Rasmlarim</span>
+            </a>
+        </div>
+    </section>
+
+    <div class="divider"></div>
+    <footer>
+        © 2026 Men haqimda websayti. Barcha huquqlar himoyalangan. &nbsp;|&nbsp; STIR: 307233449
+    </footer>
+
+    <script>
+        // === Stars ===
+        const starsEl = document.getElementById('stars');
+        for (let i = 0; i < 120; i++) {
+            const s = document.createElement('div');
+            s.className = 'star';
+            s.style.cssText = `
+                left: ${Math.random() * 100}%;
+                top: ${Math.random() * 100}%;
+                --d: ${2 + Math.random() * 4}s;
+                --delay: ${Math.random() * 5}s;
+                --min-op: ${0.05 + Math.random() * 0.15};
+                --max-op: ${0.4 + Math.random() * 0.6};
+                width: ${Math.random() > 0.8 ? 2 : 1}px;
+                height: ${Math.random() > 0.8 ? 2 : 1}px;
+            `;
+            starsEl.appendChild(s);
+        }
+
+        // === Custom Cursor ===
+        const cursor = document.getElementById('cursor');
+        const ring = document.getElementById('cursorRing');
+        let mx = 0, my = 0, rx = 0, ry = 0;
+
+        document.addEventListener('mousemove', e => {
+            mx = e.clientX; my = e.clientY;
+            cursor.style.left = mx - 5 + 'px';
+            cursor.style.top = my - 5 + 'px';
+        });
+
+        function animateRing() {
+            rx += (mx - rx - 18) * 0.12;
+            ry += (my - ry - 18) * 0.12;
+            ring.style.left = rx + 'px';
+            ring.style.top = ry + 'px';
+            requestAnimationFrame(animateRing);
+        }
+        animateRing();
+
+        document.querySelectorAll('a, button, .card').forEach(el => {
+            el.addEventListener('mouseenter', () => {
+                cursor.style.transform = 'scale(2.5)';
+                ring.style.transform = 'scale(1.5)';
+                ring.style.opacity = '0.3';
+            });
+            el.addEventListener('mouseleave', () => {
+                cursor.style.transform = 'scale(1)';
+                ring.style.transform = 'scale(1)';
+                ring.style.opacity = '0.6';
+            });
+        });
+
+        // === Scroll Progress ===
+        const progressBar = document.getElementById('progressBar');
+        window.addEventListener('scroll', () => {
+            const h = document.body.scrollHeight - window.innerHeight;
+            const p = (window.scrollY / h) * 100;
+            progressBar.style.width = p + '%';
+        });
+
+        // === Intersection Observer for sections ===
+        const sections = document.querySelectorAll('.section');
+        const navDots = document.querySelectorAll('.nav-dot');
+
+        const observer = new IntersectionObserver(entries => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, { threshold: 0.15 });
+
+        sections.forEach(s => observer.observe(s));
+
+        // Nav dot active state
+        const allSections = [
+            document.getElementById('sec0'),
+            document.getElementById('sec1'),
+            document.getElementById('sec2'),
+            document.getElementById('sec3'),
+        ];
+
+        const dotObserver = new IntersectionObserver(entries => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const idx = allSections.indexOf(entry.target);
+                    navDots.forEach((d, i) => d.classList.toggle('active', i === idx));
+                }
+            });
+        }, { threshold: 0.5 });
+
+        allSections.forEach(s => dotObserver.observe(s));
+
+        // Click on nav dots
+        navDots.forEach((dot, i) => {
+            dot.addEventListener('click', () => {
+                allSections[i]?.scrollIntoView({ behavior: 'smooth' });
+            });
+        });
+
+        // === Card tilt effect ===
+        document.querySelectorAll('.card').forEach(card => {
+            card.addEventListener('mousemove', e => {
+                const rect = card.getBoundingClientRect();
+                const x = (e.clientX - rect.left) / rect.width - 0.5;
+                const y = (e.clientY - rect.top) / rect.height - 0.5;
+                card.style.transform = `translateY(-4px) rotateX(${-y * 8}deg) rotateY(${x * 8}deg)`;
+                card.style.transformStyle = 'preserve-3d';
+            });
+            card.addEventListener('mouseleave', () => {
+                card.style.transform = '';
+            });
+        });
+
+        // === Typing effect on hero name ===
+        const nameEl = document.querySelector('.hero-name');
+        // Already revealed via CSS animation, no JS needed here
+        
+        // === Hide nav dots on mobile ===
+        if (window.innerWidth < 768) {
+            document.getElementById('navDots').style.display = 'none';
+        }
+    </script>
+</body>
+</html>
